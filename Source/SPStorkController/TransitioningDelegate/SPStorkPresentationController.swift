@@ -26,10 +26,19 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
     var swipeToDismissEnabled: Bool = true
     var tapAroundToDismissEnabled: Bool = true
     var showCloseButton: Bool = false
+    var showSizeingButton: Bool = false
     var showIndicator: Bool = true
     var indicatorColor: UIColor = UIColor.init(red: 202/255, green: 201/255, blue: 207/255, alpha: 1)
     var hideIndicatorWhenScroll: Bool = false
-    var customHeight: CGFloat? = nil
+    
+    var customHeight: CGFloat? = nil {
+        didSet {
+            if self.customHeight != nil {
+                self.storedCustomHeight = self.customHeight!
+            }
+        }
+    }
+    
     var translateForDismiss: CGFloat = 200
     
     var transitioningDelegate: SPStorkTransitioningDelegate?
@@ -38,6 +47,7 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
     var pan: UIPanGestureRecognizer?
     var tap: UITapGestureRecognizer?
     
+    private var sizingButton = SPStorkSizingButton()
     private var closeButton = SPStorkCloseButton()
     private var indicatorView = SPStorkIndicatorView()
     private var gradeView: UIView = UIView()
@@ -52,12 +62,20 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
     private var workGester: Bool = false
     private var startDismissing: Bool = false
     
+    private var storedCustomHeight: CGFloat = 0
+    
+    private var keyboardOffset: CGFloat = 0.0 {
+        didSet {
+            self.containerView?.setNeedsLayout()
+        }
+    }
+    
     private var topSpace: CGFloat {
         let statusBarHeight: CGFloat = UIApplication.shared.statusBarFrame.height
         return (statusBarHeight < 25) ? 30 : statusBarHeight
     }
     
-    private let alpha: CGFloat =  0.51
+    private let alpha: CGFloat =  0.51 //dynamically change this by factor of top space.
     var cornerRadius: CGFloat = 10
     
     private var scaleForPresentingView: CGFloat {
@@ -70,16 +88,18 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
         guard let containerView = containerView else { return .zero }
         let baseY: CGFloat = self.topSpace + 13
         let maxHeight: CGFloat = containerView.bounds.height - baseY
+        //let space = offset.isZero ? 0 : (maxHeight - offset)
         var height: CGFloat = maxHeight
         
         if let customHeight = self.customHeight {
             if customHeight < maxHeight {
-                height = customHeight
+                height = customHeight + keyboardOffset
             } else {
                 print("SPStorkController - Custom height change to default value. Your height more maximum value")
             }
         }
-        return CGRect(x: 0, y: containerView.bounds.height - height, width: containerView.bounds.width, height: height)
+        print(keyboardOffset)
+        return CGRect(x: 0, y: containerView.bounds.height - height, width: containerView.bounds.width, height: height - keyboardOffset)
     }
     
     override func presentationTransitionWillBegin() {
@@ -102,6 +122,12 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
             self.closeButton.addTarget(self, action: #selector(self.dismissAction), for: .touchUpInside)
             presentedView.addSubview(self.closeButton)
         }
+        
+        if self.showSizeingButton {
+            self.sizingButton.addTarget(self, action: #selector(self.sizingAction), for: .touchUpInside)
+            presentedView.addSubview(self.sizingButton)
+        }
+        self.updateLayoutSizingButton()
         self.updateLayoutCloseButton()
         
         let initialFrame: CGRect = presentingViewController.isPresentedAsStork ? presentingViewController.view.frame : containerView.bounds
@@ -197,11 +223,27 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
     }
     
     @objc func dismissAction() {
-        self.presentingViewController.view.endEditing(true)
-        self.presentedViewController.view.endEditing(true)
+        
         self.presentedViewController.dismiss(animated: true, completion: {
             self.storkDelegate?.didDismissStorkByTap?()
         })
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+            self.presentingViewController.view.endEditing(true)
+            self.presentedViewController.view.endEditing(true)
+        }
+    }
+    
+    @objc func sizingAction() {
+        if self.customHeight != nil {
+            self.customHeight = nil
+            self.sizingButton.mode = .down
+        } else {
+            self.customHeight = storedCustomHeight
+            self.sizingButton.mode = .up
+        }
+        
+        self.containerView?.setNeedsLayout()
     }
     
     override func dismissalTransitionWillBegin() {
@@ -275,10 +317,15 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
         self.snapshotViewContainer.removeFromSuperview()
         self.indicatorView.removeFromSuperview()
         self.closeButton.removeFromSuperview()
+        self.sizingButton.removeFromSuperview()
         
         let offscreenFrame = CGRect(x: 0, y: containerView.bounds.height, width: containerView.bounds.width, height: containerView.bounds.height)
         presentedViewController.view.frame = offscreenFrame
         presentedViewController.view.transform = .identity
+    }
+    
+    override func keyboardFrameDidChanged(_ value: CGFloat) {
+        self.keyboardOffset = value
     }
 }
 
@@ -292,8 +339,6 @@ extension SPStorkPresentationController {
             self.workGester = true
             self.indicatorView.style = .line
             self.presentingViewController.view.layer.removeAllAnimations()
-            self.presentingViewController.view.endEditing(true)
-            self.presentedViewController.view.endEditing(true)
             gestureRecognizer.setTranslation(CGPoint(x: 0, y: 0), in: containerView)
         case .changed:
             self.workGester = true
@@ -310,6 +355,11 @@ extension SPStorkPresentationController {
                 self.presentedViewController.dismiss(animated: true, completion: {
                     self.storkDelegate?.didDismissStorkBySwipe?()
                 })
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+                    self.presentingViewController.view.endEditing(true)
+                    self.presentedViewController.view.endEditing(true)
+                }
             } else {
                 self.indicatorView.style = .arrow
                 UIView.animate(
@@ -374,9 +424,9 @@ extension SPStorkPresentationController {
             
             self.presentedView?.transform = CGAffineTransform(translationX: 0, y: translationForModal)
             
-            let scaleFactor = 1 + (translationForModal / 5000)
+            let scaleFactor = 1 + (translationForModal / 5000) //snapshoot scale (z depth)
             self.snapshotView?.transform = CGAffineTransform.init(scaleX: scaleFactor, y: scaleFactor)
-            let gradeFactor = 1 + (translationForModal / 7000)
+            let gradeFactor = 1 + (translationForModal / 7000) //dimview scale
             self.gradeView.alpha = self.alpha - ((gradeFactor - 1) * 15)
         } else {
             self.presentedView?.transform = CGAffineTransform.identity
@@ -403,6 +453,7 @@ extension SPStorkPresentationController {
         coordinator.animate(alongsideTransition: { contex in
             self.updateLayoutIndicator()
             self.updateLayoutCloseButton()
+            self.updateLayoutSizingButton()
         }, completion: { [weak self] _ in
             self?.updateSnapshotAspectRatio()
             self?.updateSnapshot()
@@ -419,8 +470,16 @@ extension SPStorkPresentationController {
     
     private func updateLayoutCloseButton() {
         guard let presentedView = self.presentedView else { return }
+        let xOffset: CGFloat = self.showSizeingButton ? 38.0 : 0
+        
         self.closeButton.sizeToFit()
-        self.closeButton.layout(bottomX: presentedView.frame.width - 19, y: 19)
+        self.closeButton.layout(bottomX: presentedView.frame.width - 19 - xOffset, y: 19)
+    }
+    
+    private func updateLayoutSizingButton() {
+        guard let presentedView = self.presentedView else { return }
+        self.sizingButton.sizeToFit()
+        self.sizingButton.layout(bottomX: presentedView.frame.width - 19, y: 19)
     }
     
     private func updateSnapshot() {

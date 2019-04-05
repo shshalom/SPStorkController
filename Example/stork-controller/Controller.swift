@@ -28,9 +28,16 @@ class Controller: UIViewController {
     @objc func presentModalViewController() {
         let modal = ModalViewController()
         let transitionDelegate = SPStorkTransitioningDelegate()
+        transitionDelegate.swipeToDismissEnabled = true
+        transitionDelegate.customHeight = 200
+        transitionDelegate.showCloseButton = true
+        transitionDelegate.showSizingButton = true
         modal.transitioningDelegate = transitionDelegate
         modal.modalPresentationStyle = .custom
+        
         self.present(modal, animated: true, completion: nil)
+        
+        
     }
     
     @objc func presentModalTableViewController() {

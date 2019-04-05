@@ -45,6 +45,166 @@ class SPStorkCodeDraw : NSObject {
         
     }
     
+    @objc dynamic public class func drawSizingUp(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 29, height: 29), resizing: ResizingBehavior = .aspectFit, color: UIColor = UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)) {
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 29, height: 29), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 29, y: resizedFrame.height / 29)
+        
+        //// Rectangle Drawing
+        let rectanglePath = UIBezierPath(rect: CGRect(x: 17, y: 0, width: 12, height: 2))
+        color.setFill()
+        rectanglePath.fill()
+        
+        
+        //// Rectangle 2 Drawing
+        context.saveGState()
+        context.translateBy(x: 28, y: 6)
+        context.rotate(by: 90 * CGFloat.pi/180)
+        
+        let rectangle2Path = UIBezierPath(rect: CGRect(x: -6, y: -1, width: 12, height: 2))
+        color.setFill()
+        rectangle2Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 3 Drawing
+        context.saveGState()
+        context.translateBy(x: 22.1, y: 6.9)
+        context.rotate(by: 135 * CGFloat.pi/180)
+        
+        let rectangle3Path = UIBezierPath(rect: CGRect(x: -7.21, y: -1, width: 14.41, height: 2))
+        color.setFill()
+        rectangle3Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 4 Drawing
+        context.saveGState()
+        context.translateBy(x: 6, y: 28)
+        context.rotate(by: 180 * CGFloat.pi/180)
+        
+        let rectangle4Path = UIBezierPath(rect: CGRect(x: -6, y: -1, width: 12, height: 2))
+        color.setFill()
+        rectangle4Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 5 Drawing
+        context.saveGState()
+        context.translateBy(x: 6.1, y: 22.9)
+        context.rotate(by: 135 * CGFloat.pi/180)
+        
+        let rectangle5Path = UIBezierPath(rect: CGRect(x: -7.21, y: -1, width: 14.41, height: 2))
+        color.setFill()
+        rectangle5Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 6 Drawing
+        context.saveGState()
+        context.translateBy(x: 1, y: 22.5)
+        context.rotate(by: -90 * CGFloat.pi/180)
+        
+        let rectangle6Path = UIBezierPath(rect: CGRect(x: -6, y: -1, width: 12, height: 2))
+        color.setFill()
+        rectangle6Path.fill()
+        
+        context.restoreGState()
+        
+        context.restoreGState()
+        
+    }
+    
+    @objc dynamic public class func drawSizingDown(frame targetFrame: CGRect = CGRect(x: 0, y: 0, width: 29, height: 29), resizing: ResizingBehavior = .aspectFit, color: UIColor = UIColor(red: 0.000, green: 0.000, blue: 0.000, alpha: 1.000)) {
+        
+        //// General Declarations
+        let context = UIGraphicsGetCurrentContext()!
+        
+        //// Resize to Target Frame
+        context.saveGState()
+        let resizedFrame: CGRect = resizing.apply(rect: CGRect(x: 0, y: 0, width: 29, height: 29), target: targetFrame)
+        context.translateBy(x: resizedFrame.minX, y: resizedFrame.minY)
+        context.scaleBy(x: resizedFrame.width / 29, y: resizedFrame.height / 29)
+        
+        //// Rectangle Drawing
+        let rectanglePath = UIBezierPath(rect: CGRect(x: 1, y: 16, width: 12, height: 2))
+        color.setFill()
+        rectanglePath.fill()
+        
+        
+        //// Rectangle 2 Drawing
+        context.saveGState()
+        context.translateBy(x: 12, y: 22)
+        context.rotate(by: 90 * CGFloat.pi/180)
+        
+        let rectangle2Path = UIBezierPath(rect: CGRect(x: -6, y: -1, width: 12, height: 2))
+        color.setFill()
+        rectangle2Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 3 Drawing
+        context.saveGState()
+        context.translateBy(x: 6.1, y: 22.9)
+        context.rotate(by: 135 * CGFloat.pi/180)
+        
+        let rectangle3Path = UIBezierPath(rect: CGRect(x: -7.21, y: -1, width: 14.41, height: 2))
+        color.setFill()
+        rectangle3Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 4 Drawing
+        context.saveGState()
+        context.translateBy(x: 23, y: 11)
+        context.rotate(by: 180 * CGFloat.pi/180)
+        
+        let rectangle4Path = UIBezierPath(rect: CGRect(x: -6, y: -1, width: 12, height: 2))
+        color.setFill()
+        rectangle4Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 5 Drawing
+        context.saveGState()
+        context.translateBy(x: 23.1, y: 5.9)
+        context.rotate(by: 135 * CGFloat.pi/180)
+        
+        let rectangle5Path = UIBezierPath(rect: CGRect(x: -7.21, y: -1, width: 14.41, height: 2))
+        color.setFill()
+        rectangle5Path.fill()
+        
+        context.restoreGState()
+        
+        
+        //// Rectangle 6 Drawing
+        context.saveGState()
+        context.translateBy(x: 18, y: 5.5)
+        context.rotate(by: -90 * CGFloat.pi/180)
+        
+        let rectangle6Path = UIBezierPath(rect: CGRect(x: -6, y: -1, width: 12, height: 2))
+        color.setFill()
+        rectangle6Path.fill()
+        
+        context.restoreGState()
+        
+        context.restoreGState()
+        
+    }
+
+    
     @objc(StyleKitNameResizingBehavior)
     enum ResizingBehavior: Int {
         case aspectFit
