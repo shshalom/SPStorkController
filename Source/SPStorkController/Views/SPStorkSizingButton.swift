@@ -46,7 +46,7 @@ open class SPStorkSizingButton: UIButton {
         }
     }
     
-    init() {
+    public init() {
         super.init(frame: .zero)
         self.commonInit()
     }

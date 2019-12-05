@@ -39,6 +39,8 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
         }
     }
     
+    var isSizing: Bool = false
+    
     var translateForDismiss: CGFloat = 200
     
     var transitioningDelegate: SPStorkTransitioningDelegate?
@@ -222,6 +224,7 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
         }
     }
     
+    
     @objc func dismissAction() {
         
         self.presentedViewController.dismiss(animated: true, completion: {
@@ -235,6 +238,8 @@ class SPStorkPresentationController: UIPresentationController, UIGestureRecogniz
     }
     
     @objc func sizingAction() {
+        
+        isSizing = true
         if self.customHeight != nil {
             self.customHeight = nil
             self.sizingButton.mode = .down
@@ -441,9 +446,16 @@ extension SPStorkPresentationController {
         guard let containerView = containerView else { return }
         self.updateSnapshotAspectRatio()
         if presentedViewController.view.isDescendant(of: containerView) {
-            UIView.animate(withDuration: 0.1) { [weak self] in
-                guard let `self` = self else { return }
+            
+            if isSizing {
+            UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 1.0, options: UIView.AnimationOptions.curveEaseOut, animations: {
                 self.presentedViewController.view.frame = self.frameOfPresentedViewInContainerView
+            })
+            } else {
+              UIView.animate(withDuration: 0.1) { [weak self] in
+                    guard let `self` = self else { return }
+                    self.presentedViewController.view.frame = self.frameOfPresentedViewInContainerView
+               }
             }
         }
     }

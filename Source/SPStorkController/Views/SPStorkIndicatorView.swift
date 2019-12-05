@@ -21,9 +21,9 @@
 
 import UIKit
 
-class SPStorkIndicatorView: UIView {
+open class SPStorkIndicatorView: UIView {
     
-    var style: Style = .line {
+    open var style: Style = .line {
         didSet {
             switch self.style {
             case .line:
@@ -42,7 +42,7 @@ class SPStorkIndicatorView: UIView {
         }
     }
     
-    var color: UIColor = UIColor.init(red: 202/255, green: 201/255, blue: 207/255, alpha: 1) {
+    open var color: UIColor = UIColor.init(red: 202/255, green: 201/255, blue: 207/255, alpha: 1) {
         didSet {
             self.leftView.backgroundColor = self.color
             self.rightView.backgroundColor = self.color
@@ -52,7 +52,7 @@ class SPStorkIndicatorView: UIView {
     private var leftView: UIView = UIView()
     private var rightView: UIView = UIView()
     
-    init() {
+    public init() {
         super.init(frame: .zero)
         self.backgroundColor = UIColor.clear
         self.addSubview(self.leftView)
@@ -60,11 +60,11 @@ class SPStorkIndicatorView: UIView {
         self.color = UIColor.init(red: 202/255, green: 201/255, blue: 207/255, alpha: 1)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func sizeToFit() {
+    override open func sizeToFit() {
         super.sizeToFit()
         self.frame = CGRect.init(x: self.frame.origin.x, y: self.frame.origin.y, width: 36, height: 13)
         
@@ -86,7 +86,7 @@ class SPStorkIndicatorView: UIView {
         })
     }
     
-    enum Style {
+    public enum Style {
         case arrow
         case line
     }

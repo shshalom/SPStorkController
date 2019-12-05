@@ -10,7 +10,7 @@ import UIKit
 
 extension UIPresentationController {
     
-    @objc func keyboardFrameDidChanged(_ value: CGFloat) {
+    @objc public func keyboardFrameDidChanged(_ value: CGFloat) {
         
     }
 }
